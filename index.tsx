@@ -63,21 +63,21 @@ import OrgChart from "./orgchart";
   }
  */
 
-interface DecisionTree {
+interface IDecisionTree {
   data: string[];
   subNodes?: DecisionTree[];
 }
 
-class DecisionTree extends React.Component<any, any> {
+export default class DecisionTree extends React.Component<any, any> {
   public subNodeRecursion(
     chart: OrgChart,
     subKey: number,
-    childNode: DecisionTree,
+    childNode: IDecisionTree,
     parentNode: number
   ) {
     chart.addNode(subKey, parentNode, "u", childNode.data.join("\n"));
     if (childNode.subNodes) {
-      childNode.subNodes.map((subNode: DecisionTree, newKey: number) => {
+      childNode.subNodes.map((subNode: IDecisionTree, newKey: number) => {
         this.subNodeRecursion(chart, newKey, subNode, subKey);
       });
     }
@@ -88,10 +88,10 @@ class DecisionTree extends React.Component<any, any> {
 
     const chart = new OrgChart();
 
-    data.map((node: DecisionTree, key: number) => {
+    data.map((node: IDecisionTree, key: number) => {
       chart.addNode(key, "", "u", node.data.join("\n"));
       if (node.subNodes) {
-        node.subNodes.map((subNode: DecisionTree, subKey: number) => {
+        node.subNodes.map((subNode: IDecisionTree, subKey: number) => {
           this.subNodeRecursion(chart, subKey, subNode, key);
         });
       }

@@ -42,3 +42,4 @@ var DecisionTree = /** @class */ (function (_super) {
     };
     return DecisionTree;
 }(React.Component));
+exports["default"] = DecisionTree;

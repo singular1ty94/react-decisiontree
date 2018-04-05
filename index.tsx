@@ -69,6 +69,31 @@ interface IDecisionTree {
 }
 
 export default class DecisionTree extends React.Component<any, any> {
+  constructor(props){
+    super(props);
+    const { rootNode } = this.props;
+    const chart = new OrgChart();
+
+    chart.addNode(0, "", "u", rootNode.data.join("\n"));
+    if (rootNode.subNodes) {
+      rootNode.subNodes.map((subNode: IDecisionTree, subKey: number) => {
+        this.subNodeRecursion(chart, subKey, subNode, 0);
+      });
+    }
+
+    this.setState({
+        chart
+    })
+  }
+ 
+  public componentDidMount() {
+     this.updateCanvas();
+  }
+
+  updateCanvas = () => {
+     this.state.drawChart(this.refs.canvas)
+  }
+
   public subNodeRecursion(
     chart: OrgChart,
     subKey: number,
@@ -84,29 +109,13 @@ export default class DecisionTree extends React.Component<any, any> {
   }
 
   public render() {
-    const { width, height, id, rootNode } = this.props;
-
-    const chart = new OrgChart();
-
-
-    chart.addNode(0, "", "u", rootNode.data.join("\n"));
-    if (rootNode.subNodes) {
-      rootNode.subNodes.map((subNode: IDecisionTree, subKey: number) => {
-        this.subNodeRecursion(chart, subKey, subNode, 0);
-      });
-    }
-
-    
-
     return (
-      <div>
-	      <canvas
-		id={id || "decision-tree"}
-		width={width || "800"}
-		height={height || "600"}
-	      />
-	      {chart.drawChart(`${id || "decision-tree"}`)}
-      </div>
+      <canvas
+	ref="canvas"
+	id="canvas"
+	width={this.props.width || "800"}
+	height={this.props.height || "600"}
+      />
     );
   }
 }

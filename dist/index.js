@@ -14,9 +14,27 @@ var React = require("react");
 var orgchart_1 = require("./orgchart");
 var DecisionTree = /** @class */ (function (_super) {
     __extends(DecisionTree, _super);
-    function DecisionTree() {
-        return _super !== null && _super.apply(this, arguments) || this;
+    function DecisionTree(props) {
+        var _this = _super.call(this, props) || this;
+        _this.updateCanvas = function () {
+            _this.state.drawChart(_this.refs.canvas);
+        };
+        var rootNode = _this.props.rootNode;
+        var chart = new orgchart_1["default"]();
+        chart.addNode(0, "", "u", rootNode.data.join("\n"));
+        if (rootNode.subNodes) {
+            rootNode.subNodes.map(function (subNode, subKey) {
+                _this.subNodeRecursion(chart, subKey, subNode, 0);
+            });
+        }
+        _this.setState({
+            chart: chart
+        });
+        return _this;
     }
+    DecisionTree.prototype.componentDidMount = function () {
+        this.updateCanvas();
+    };
     DecisionTree.prototype.subNodeRecursion = function (chart, subKey, childNode, parentNode) {
         var _this = this;
         chart.addNode(subKey, parentNode, "u", childNode.data.join("\n"));
@@ -27,18 +45,7 @@ var DecisionTree = /** @class */ (function (_super) {
         }
     };
     DecisionTree.prototype.render = function () {
-        var _this = this;
-        var _a = this.props, width = _a.width, height = _a.height, id = _a.id, rootNode = _a.rootNode;
-        var chart = new orgchart_1["default"]();
-        chart.addNode(0, "", "u", rootNode.data.join("\n"));
-        if (rootNode.subNodes) {
-            rootNode.subNodes.map(function (subNode, subKey) {
-                _this.subNodeRecursion(chart, subKey, subNode, 0);
-            });
-        }
-        return (React.createElement("div", null,
-            React.createElement("canvas", { id: id || "decision-tree", width: width || "800", height: height || "600" }),
-            chart.drawChart("" + (id || "decision-tree"))));
+        return (React.createElement("canvas", { ref: "canvas", id: "canvas", width: this.props.width || "800", height: this.props.height || "600" }));
     };
     return DecisionTree;
 }(React.Component));

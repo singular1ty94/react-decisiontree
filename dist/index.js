@@ -36,8 +36,9 @@ var DecisionTree = /** @class */ (function (_super) {
                 _this.subNodeRecursion(chart, subKey, subNode, 0);
             });
         }
-        chart.drawChart("" + (id || "decision-tree"));
-        return (React.createElement("canvas", { id: id || "decision-tree", width: width || "800", height: height || "600" }));
+        return (React.createElement("div", null,
+            React.createElement("canvas", { id: id || "decision-tree", width: width || "800", height: height || "600" }),
+            chart.drawChart("" + (id || "decision-tree"))));
     };
     return DecisionTree;
 }(React.Component));

@@ -96,14 +96,17 @@ export default class DecisionTree extends React.Component<any, any> {
       });
     }
 
-    chart.drawChart(`${id || "decision-tree"}`);
+    
 
     return (
-      <canvas
-        id={id || "decision-tree"}
-        width={width || "800"}
-        height={height || "600"}
-      />
+      <div>
+	      <canvas
+		id={id || "decision-tree"}
+		width={width || "800"}
+		height={height || "600"}
+	      />
+	      {chart.drawChart(`${id || "decision-tree"}`)}
+      </div>
     );
   }
 }

@@ -1,0 +1,22 @@
+{
+  "defaultSeverity": "error",
+  "extends": ["tslint:recommended"],
+  "jsRules": {},
+  "rules": {
+    "no-unused-expression": true,
+    "no-duplicate-variable": true,
+    "one-variable-per-declaration": false,
+    "no-unused-variable": true,
+    "curly": true,
+    "class-name": true,
+    "prefer-const": true,
+    "no-var-keyword": true,
+    "no-shadowed-variable": true,
+    "semicolon": true,
+    "triple-equals": true,
+    "trailing-comma": false,
+    "jsdoc-format": false
+  },
+  "rulesDirectory": [],
+  "exclude": ["node_modules"]
+}

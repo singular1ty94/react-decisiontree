@@ -65,7 +65,7 @@ import OrgChart from "./orgchart";
 
 interface IDecisionTree {
   data: string[];
-  subNodes?: DecisionTree[];
+  subNodes?: IDecisionTree[];
 }
 
 export default class DecisionTree extends React.Component<any, any> {

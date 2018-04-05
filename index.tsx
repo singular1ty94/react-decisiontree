@@ -15,7 +15,7 @@ import OrgChart from "./orgchart";
     "value = [50, 50, 50]",
     "class = Iris-setosa"
   ],
-  subNodes = [{
+  subNodes : [{
     data: [
       "entropy = 0.0",
       "samples = 50",
@@ -30,7 +30,7 @@ import OrgChart from "./orgchart";
       "value = [0, 50, 50]",
       "class = Iris-versicolor"
     ],
-    subNodes = [{
+    subNodes : [{
         data: [
           "petallength < 4.95",
           "entropy = 0.445",
@@ -59,7 +59,7 @@ import OrgChart from "./orgchart";
       "value = [50, 50, 50]",
       "class = Iris-setosa"
     ],
-    subNodes = []
+    subNodes: []
   }
  */
 
@@ -84,18 +84,17 @@ export default class DecisionTree extends React.Component<any, any> {
   }
 
   public render() {
-    const { width, height, id, data } = this.props;
+    const { width, height, id, rootNode } = this.props;
 
     const chart = new OrgChart();
 
-    data.map((node: IDecisionTree, key: number) => {
-      chart.addNode(key, "", "u", node.data.join("\n"));
-      if (node.subNodes) {
-        node.subNodes.map((subNode: IDecisionTree, subKey: number) => {
-          this.subNodeRecursion(chart, subKey, subNode, key);
-        });
-      }
-    });
+
+    chart.addNode(0, "", "u", rootNode.data.join("\n"));
+    if (rootNode.subNodes) {
+      rootNode.subNodes.map((subNode: IDecisionTree, subKey: number) => {
+        this.subNodeRecursion(chart, subKey, subNode, 0);
+      });
+    }
 
     return (
       <canvas

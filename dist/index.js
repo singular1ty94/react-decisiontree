@@ -28,16 +28,14 @@ var DecisionTree = /** @class */ (function (_super) {
     };
     DecisionTree.prototype.render = function () {
         var _this = this;
-        var _a = this.props, width = _a.width, height = _a.height, id = _a.id, data = _a.data;
+        var _a = this.props, width = _a.width, height = _a.height, id = _a.id, rootNode = _a.rootNode;
         var chart = new orgchart_1["default"]();
-        data.map(function (node, key) {
-            chart.addNode(key, "", "u", node.data.join("\n"));
-            if (node.subNodes) {
-                node.subNodes.map(function (subNode, subKey) {
-                    _this.subNodeRecursion(chart, subKey, subNode, key);
-                });
-            }
-        });
+        chart.addNode(0, "", "u", rootNode.data.join("\n"));
+        if (rootNode.subNodes) {
+            rootNode.subNodes.map(function (subNode, subKey) {
+                _this.subNodeRecursion(chart, subKey, subNode, 0);
+            });
+        }
         return (React.createElement("canvas", { id: id || "decision-tree", width: width || "800", height: height || "600" }));
     };
     return DecisionTree;

@@ -2393,7 +2393,7 @@ export default class OrgChart {
     this.nodes[this.nodes.length] = n;
   }
 
-  public drawChart = (id, align, fit) => {
+  public drawChart = (id, align?, fit?) => {
     // siblings may be added. Reset all positions first:
     let i;
     for (i = 0; i < this.nodes.length; i++) {

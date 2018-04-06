@@ -1,6 +1,6 @@
 "use strict";
-exports.__esModule = true;
-// Version 1.16
+/// <reference path="./index.d.ts" />
+// Version 1.16 - Version 1.0 of Typescript Version by singular1ty94
 //
 // Interface:
 //
@@ -76,12 +76,14 @@ exports.__esModule = true;
 //
 // eg. var MyChart = new orgChart();
 //
-var gVmlCanvasManager = null; // so non-IE won't freak out
+exports.__esModule = true;
+var G_vmlCanvasManager; // so non-IE won't freak out
 var OrgChart = /** @class */ (function () {
-    function OrgChart() {
+    function OrgChart(properties) {
         ///////////////////
         // Default values:
         ///////////////////
+        if (properties === void 0) { properties = {}; }
         var _this = this;
         this.drawChart = function (id, align, fit) {
             // siblings may be added. Reset all positions first:
@@ -99,27 +101,24 @@ var OrgChart = /** @class */ (function () {
             _this.drawChartPriv(id, false);
         };
         this.lineColor = // Color of the connection lines (global for all lines)
-            "#3388DD";
-        this.boxWidth = 120; // Box width (global for all boxes)
-        this.boxHeight = 30; // Box height (global for all boxes)
-        this.hSpace = 30; // Horizontal space in between the boxes (global for all boxes)
-        this.vSpace = 20; // Vertical space in between the boxes (global for all boxes)
+            properties.lineColor || "#3388DD";
+        this.boxWidth = properties.boxWidth || 160; // Box width (global for all boxes)
+        this.boxHeight = properties.boxHeight || 80; // Box height (global for all boxes)
+        this.hSpace = properties.hSpace || 30; // Horizontal space in between the boxes (global for all boxes)
+        this.vSpace = properties.vSpace || 60; // Vertical space in between the boxes (global for all boxes)
         this.hShift = 15; // The number of pixels vertical siblings are shifted (global for all boxes)
-        this.boxLineColor = // Default box line color
-            "#B5D9EA";
         this.boxFillColor = // Default box fill color
-            "#CFE8EF";
+            properties.boxFillColor || "#CFE8EF";
+        this.boxLineColor = // Default box line color
+            properties.boxLineColor || this.boxFillColor;
         this.textColor = // Default box text color
-            "#000000";
+            properties.textColor || "#000000";
         this.textFont = // Default font
-            "arial";
+            properties.textFont || "arial";
         this.textSize = 12; // Default text size (pixels, not points)
         this.textVAlign = 1; // Default text alignment
-        this.curshadowOffsetX = 3;
-        this.curshadowOffsetY = 3;
-        this.shadowColor = "#A1A1A1";
-        this.curtopradius = 5;
-        this.curbotradius = 5;
+        this.curtopradius = 0;
+        this.curbotradius = 0;
         this.nodes = [];
         var theCanvas;
         this.centerParentOverCompleteTree = 0; // Experimental, lines may loose connections
@@ -171,7 +170,7 @@ var OrgChart = /** @class */ (function () {
         ////////////////////////////////////
         // Internal information structures:
         ////////////////////////////////////
-        this.TreeNode = function (id, parent, contype, txt, bold, url, linecolor, fillcolor, textcolor, imgalign, imgvalign) {
+        this.TreeNode = function (id, parent, contype, txt, bold, url, linecolor, fillcolor, textcolor, imgalign, imgvalign, curtopradius, curbotradius, textFont, textSize, textVAlign) {
             this.id = id; // User defined id
             this.parent = parent; // Parent id, user defined
             this.parentix = -1; // Parent index in the nodes array, -1 for no parent
@@ -182,9 +181,9 @@ var OrgChart = /** @class */ (function () {
             this.linecolor = linecolor;
             this.fillcolor = fillcolor;
             this.textcolor = textcolor;
-            this.textfont = this.textFont;
-            this.textsize = this.textSize;
-            this.valign = this.textVAlign;
+            this.textfont = textFont;
+            this.textsize = textSize;
+            this.valign = textVAlign;
             this.hpos = -1; // Horizontal starting position in pixels
             this.vpos = -1; // Vertical starting position in pixels
             this.usib = []; // 'u' siblings
@@ -194,10 +193,8 @@ var OrgChart = /** @class */ (function () {
             this.imgAlign = imgalign; // Image alignment 'l', 'c', 'r'
             this.imgVAlign = imgvalign; // Image vertical alignment 't', 'm', 'b'
             this.imgDrawn = 0;
-            this.topradius = this.curtopradius;
-            this.botradius = this.curbotradius;
-            this.shadowOffsetX = this.curshadowOffsetX;
-            this.shadowOffsetY = this.curshadowOffsetY;
+            this.topradius = curtopradius;
+            this.botradius = curbotradius;
         };
         //////////////////////
         // Internal functions:
@@ -215,9 +212,9 @@ var OrgChart = /** @class */ (function () {
                 alert("Canvas id '" + id + "' not found");
                 return;
             }
-            if (gVmlCanvasManager !== undefined) {
+            if (G_vmlCanvasManager !== undefined) {
                 // ie IE
-                gVmlCanvasManager.initElement(theCanvas);
+                G_vmlCanvasManager.initElement(theCanvas);
             }
             ctx = theCanvas.getContext("2d");
             ctx.lineWidth = 1;
@@ -246,11 +243,11 @@ var OrgChart = /** @class */ (function () {
                 var i_1;
                 leftOnCanvas();
                 for (i_1 = 0; i_1 < _this.nodes.length; i_1++) {
-                    if (_this.nodes[i_1].hpos + _this.boxWidth + _this.nodes[i_1].shadowOffsetX > maxW) {
-                        maxW = _this.nodes[i_1].hpos + _this.boxWidth + _this.nodes[i_1].shadowOffsetX;
+                    if (_this.nodes[i_1].hpos + _this.boxWidth > maxW) {
+                        maxW = _this.nodes[i_1].hpos + _this.boxWidth;
                     }
-                    if (_this.nodes[i_1].vpos + _this.boxHeight + _this.nodes[i_1].shadowOffsetY > maxH) {
-                        maxH = _this.nodes[i_1].vpos + _this.boxHeight + _this.nodes[i_1].shadowOffsetY;
+                    if (_this.nodes[i_1].vpos + _this.boxHeight > maxH) {
+                        maxH = _this.nodes[i_1].vpos + _this.boxHeight;
                     }
                 }
                 if (maxW > 0 && maxH > 0) {
@@ -746,8 +743,8 @@ var OrgChart = /** @class */ (function () {
             x = 0;
             for (i = 0; i < _this.nodes.length; i++) {
                 if (_this.nodes[i].parent === "") {
-                    _this.nodes[i].hpos = x + _this.nodes[i].shadowOffsetX;
-                    _this.nodes[i].vpos = 0 + _this.nodes[i].shadowOffsetY;
+                    _this.nodes[i].hpos = x;
+                    _this.nodes[i].vpos = 0;
                     positionTree(i, x, x);
                     // hpos can be changed during positionTree:
                     x = findRightMost(i) + _this.boxWidth + _this.hSpace; // Start for next tree
@@ -1226,7 +1223,6 @@ var OrgChart = /** @class */ (function () {
         };
         drawNode = function (ctx, i) {
             var ix;
-            var gradient;
             var maxrad;
             var imgrad;
             var x = _this.nodes[i].hpos;
@@ -1246,42 +1242,9 @@ var OrgChart = /** @class */ (function () {
             var imgvalign = _this.nodes[i].imgVAlign;
             var toprad = _this.nodes[i].topradius;
             var botrad = _this.nodes[i].botradius;
-            var shadowx = _this.nodes[i].shadowOffsetX;
-            var shadowy = _this.nodes[i].shadowOffsetY;
-            // Draw shadow with gradient first:
-            if (shadowx > 0) {
-                x += shadowx;
-                y += shadowy;
-                ctx.fillStyle = _this.shadowColor;
-                ctx.beginPath();
-                ctx.moveTo(x + toprad, y);
-                ctx.lineTo(x + width - toprad, y);
-                if (toprad > 0) {
-                    ctx.quadraticCurveTo(x + width, y, x + width, y + toprad);
-                }
-                ctx.lineTo(x + width, y + height - botrad);
-                if (botrad > 0) {
-                    ctx.quadraticCurveTo(x + width, y + height, x + width - botrad, y + height);
-                }
-                ctx.lineTo(x + botrad, y + height);
-                if (botrad > 0) {
-                    ctx.quadraticCurveTo(x, y + height, x, y + height - botrad);
-                }
-                ctx.lineTo(x, y + toprad);
-                if (toprad > 0) {
-                    ctx.quadraticCurveTo(x, y, x + toprad, y);
-                }
-                ctx.closePath();
-                ctx.fill();
-                x -= shadowx;
-                y -= shadowy;
-            }
             // Draw the box:
             ctx.lineWidth = bold ? 2 : 1;
-            gradient = ctx.createLinearGradient(x, y, x, y + height);
-            gradient.addColorStop(0, "#FFFFFF");
-            gradient.addColorStop(0.7, bfcolor);
-            ctx.fillStyle = gradient;
+            ctx.fillStyle = bfcolor;
             ctx.strokeStyle = blcolor;
             ctx.beginPath();
             ctx.moveTo(x + toprad, y);
@@ -1546,8 +1509,9 @@ var OrgChart = /** @class */ (function () {
                 // Top and left lines of siblings
                 if (_this.nodes[i].parentix >= 0) {
                     if (_this.nodes[i].contype === "u") {
+                        // Line from top of hanging node to bridging line
                         ctx.moveTo(_this.nodes[i].hpos + _this.boxWidth / 2, _this.nodes[i].vpos);
-                        ctx.lineTo(_this.nodes[i].hpos + _this.boxWidth / 2, _this.nodes[i].vpos - _this.vSpace / 2);
+                        ctx.lineTo(_this.nodes[_this.nodes[i].parentix].hpos + _this.boxWidth / 2, _this.nodes[_this.nodes[i].parentix].vpos + _this.boxHeight);
                     }
                     if (_this.nodes[i].contype === "l") {
                         ctx.moveTo(_this.nodes[i].hpos + _this.boxWidth, _this.nodes[i].vpos + _this.boxHeight / 2);
@@ -1558,25 +1522,26 @@ var OrgChart = /** @class */ (function () {
                         ctx.lineTo(_this.nodes[_this.nodes[i].parentix].hpos + _this.boxWidth / 2, _this.nodes[i].vpos + _this.boxHeight / 2);
                     }
                 }
-                // Downline if any siblings:
-                v = getEndOfDownline(i);
-                if (v >= 0) {
-                    ctx.moveTo(_this.nodes[i].hpos + _this.boxWidth / 2, _this.nodes[i].vpos + _this.boxHeight);
-                    ctx.lineTo(_this.nodes[i].hpos + _this.boxWidth / 2, v);
-                }
-                // Horizontal line above multiple 'u' sibs:
-                if (_this.nodes[i].usib.length > 1) {
-                    f = _this.nodes[i].usib[0];
-                    l = _this.nodes[i].usib[_this.nodes[i].usib.length - 1];
-                    ctx.moveTo(_this.nodes[f].hpos + _this.boxWidth / 2, _this.nodes[f].vpos - _this.vSpace / 2);
-                    ctx.lineTo(_this.nodes[l].hpos + _this.boxWidth / 2, _this.nodes[f].vpos - _this.vSpace / 2);
-                }
-                // Horizontal line above a single 'u' sib, if not aligned:
-                if (_this.nodes[i].usib.length === 1) {
-                    f = _this.nodes[i].usib[0];
-                    ctx.moveTo(_this.nodes[f].hpos + _this.boxWidth / 2, _this.nodes[f].vpos - _this.vSpace / 2);
-                    ctx.lineTo(_this.nodes[i].hpos + _this.boxWidth / 2, _this.nodes[f].vpos - _this.vSpace / 2);
-                }
+                // // Downline if any siblings:
+                // v = getEndOfDownline(i);
+                // if (v >= 0) {
+                //   // Create the line from a parent down to the bridging line
+                //   ctx.moveTo(this.nodes[i].hpos + this.boxWidth / 2, this.nodes[i].vpos + this.boxHeight);
+                //   ctx.lineTo(this.nodes[i].hpos + this.boxWidth / 2, v);
+                // }
+                // // Horizontal line above multiple 'u' sibs (bridging line)
+                // if (this.nodes[i].usib.length > 1) {
+                //   f = this.nodes[i].usib[0];
+                //   l = this.nodes[i].usib[this.nodes[i].usib.length - 1];
+                //   ctx.moveTo(this.nodes[f].hpos + this.boxWidth / 2, this.nodes[f].vpos - this.vSpace / 2);
+                //   ctx.lineTo(this.nodes[l].hpos + this.boxWidth / 2, this.nodes[f].vpos - this.vSpace / 2);
+                // }
+                // // Horizontal line above a single 'u' sib, if not aligned:
+                // if (this.nodes[i].usib.length === 1) {
+                //   f = this.nodes[i].usib[0];
+                //   ctx.moveTo(this.nodes[f].hpos + this.boxWidth / 2, this.nodes[f].vpos - this.vSpace / 2);
+                //   ctx.lineTo(this.nodes[i].hpos + this.boxWidth / 2, this.nodes[f].vpos - this.vSpace / 2);
+                // }
             }
             ctx.stroke();
         };
@@ -1837,7 +1802,7 @@ var OrgChart = /** @class */ (function () {
                         x = findRightMost(_this.nodes[p].lsib[h], v);
                         maxx = Math.max(x, maxx);
                         if (maxx < 0) {
-                            maxx = _this.curshadowOffsetX;
+                            maxx = 0;
                         }
                         // If the node found is the lsib itself, use this.hShift. Otherwise use hSpace/2, it looks better.
                         if (x === _this.nodes[_this.nodes[p].lsib[h]].hpos) {
@@ -1939,16 +1904,12 @@ var OrgChart = /** @class */ (function () {
             this.hShift = Math.max(3, hshift);
         }
     };
-    OrgChart.prototype.setNodeStyle = function (toprad, botrad, shadow) {
+    OrgChart.prototype.setNodeStyle = function (toprad, botrad) {
         if (toprad !== undefined && toprad >= 0) {
             this.curtopradius = toprad;
         }
         if (botrad !== undefined && botrad >= 0) {
             this.curbotradius = botrad;
-        }
-        if (shadow !== undefined && shadow >= 0) {
-            this.curshadowOffsetX = shadow;
-            this.curshadowOffsetY = shadow;
         }
     };
     OrgChart.prototype.setFont = function (fname, size, color, valign) {
@@ -2054,7 +2015,7 @@ var OrgChart = /** @class */ (function () {
                 return;
             }
         }
-        var n = new this.TreeNode(id, parent, ctype, text, bold, url, linecolor, fillcolor, textcolor, imgalign, imgvalign);
+        var n = new this.TreeNode(id, parent, ctype, text, bold, url, linecolor, fillcolor, textcolor, imgalign, imgvalign, this.curtopradius, this.curbotradius, this.textFont, this.textSize, this.textVAlign);
         if (img !== undefined) {
             n.img = new Image();
             n.img.src = img;
@@ -2066,4 +2027,4 @@ var OrgChart = /** @class */ (function () {
     };
     return OrgChart;
 }()); // orgChart
-exports["default"] = OrgChart;
+exports.OrgChart = OrgChart;

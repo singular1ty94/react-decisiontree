@@ -1,97 +1,38 @@
+/// <reference path="./index.d.ts" />
 import * as React from "react";
-import OrgChart from "./orgchart";
+import { v4 } from "uuid";
+import { OrgChart } from "./orgchart";
 
-/**
- * Example usage:
-   <DecisionTree 
-        width={500}
-        height={300}
-        data={
-            {
-  data: [
-    "petallength < 2.45",
-    "entropy = 1.585",
-    "samples = 150",
-    "value = [50, 50, 50]",
-    "class = Iris-setosa"
-  ],
-  subNodes : [{
-    data: [
-      "entropy = 0.0",
-      "samples = 50",
-      "value = [50, 0, 0]",
-      "class = Iris-setosa"
-    ]
-  },{
-    data: [
-      "petalwidth < 1.75",
-      "entropy = 1.0",
-      "samples = 100",
-      "value = [0, 50, 50]",
-      "class = Iris-versicolor"
-    ],
-    subNodes : [{
-        data: [
-          "petallength < 4.95",
-          "entropy = 0.445",
-          "samples = 54",
-          "value = [0, 49, 5]",
-          "class = Iris-versicolor"
-        ]
-      }, {
-        data: [
-          "petallength < 4.85",
-          "entropy = 0.151",
-          "samples = 56",
-          "value = [0, 1, 45]",
-          "class = Iris-virginica"
-        ]
-      }]
-  }]
-}
-        }
-   />
-   {
-    data: [
-      "petallength < 2.45",
-      "entropy = 1.585",
-      "samples = 150",
-      "value = [50, 50, 50]",
-      "class = Iris-setosa"
-    ],
-    subNodes: []
-  }
- */
-
-interface IDecisionTree {
-  data: string[];
-  subNodes?: IDecisionTree[];
+interface IDecisionTreeState {
+  chart: OrgChart;
 }
 
-export default class DecisionTree extends React.Component<any, any> {
-  constructor(props){
+export default class DecisionTree extends React.Component<IDecisionTreeProps, IDecisionTreeState> {
+  constructor(props) {
     super(props);
-    const { rootNode } = this.props;
-    const chart = new OrgChart();
+    const { rootNode, chartStyles } = this.props;
+    const chart = new OrgChart(chartStyles);
 
-    chart.addNode(0, "", "u", rootNode.data.join("\n"));
+    const rootId = v4();
+
+    chart.addNode(rootId, "", "u", rootNode.data.join("\n"));
     if (rootNode.subNodes) {
       rootNode.subNodes.map((subNode: IDecisionTree, subKey: number) => {
-        this.subNodeRecursion(chart, subKey, subNode, 0);
+        this.subNodeRecursion(chart, v4(), subNode, rootId);
       });
     }
 
-    this.setState({
+    this.state = {
         chart
-    })
+    };
   }
- 
+
   public componentDidMount() {
      this.updateCanvas();
   }
 
-  updateCanvas = () => {
-     this.state.drawChart(this.refs.canvas)
+  public updateCanvas = () => {
+     this.state.chart.drawChart("canvas");
   }
 
   public subNodeRecursion(
@@ -111,10 +52,9 @@ export default class DecisionTree extends React.Component<any, any> {
   public render() {
     return (
       <canvas
-	ref="canvas"
-	id="canvas"
-	width={this.props.width || "800"}
-	height={this.props.height || "600"}
+        id="canvas"
+        width={this.props.width || "1000"}
+        height={this.props.height || "800"}
       />
     );
   }

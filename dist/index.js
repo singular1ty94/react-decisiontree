@@ -10,26 +10,29 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 exports.__esModule = true;
+/// <reference path="./index.d.ts" />
 var React = require("react");
+var uuid_1 = require("uuid");
 var orgchart_1 = require("./orgchart");
 var DecisionTree = /** @class */ (function (_super) {
     __extends(DecisionTree, _super);
     function DecisionTree(props) {
         var _this = _super.call(this, props) || this;
         _this.updateCanvas = function () {
-            _this.state.drawChart(_this.refs.canvas);
+            _this.state.chart.drawChart("canvas");
         };
-        var rootNode = _this.props.rootNode;
-        var chart = new orgchart_1["default"]();
-        chart.addNode(0, "", "u", rootNode.data.join("\n"));
+        var _a = _this.props, rootNode = _a.rootNode, chartStyles = _a.chartStyles;
+        var chart = new orgchart_1.OrgChart(chartStyles);
+        var rootId = uuid_1.v4();
+        chart.addNode(rootId, "", "u", rootNode.data.join("\n"));
         if (rootNode.subNodes) {
             rootNode.subNodes.map(function (subNode, subKey) {
-                _this.subNodeRecursion(chart, subKey, subNode, 0);
+                _this.subNodeRecursion(chart, uuid_1.v4(), subNode, rootId);
             });
         }
-        _this.setState({
+        _this.state = {
             chart: chart
-        });
+        };
         return _this;
     }
     DecisionTree.prototype.componentDidMount = function () {
@@ -45,7 +48,7 @@ var DecisionTree = /** @class */ (function (_super) {
         }
     };
     DecisionTree.prototype.render = function () {
-        return (React.createElement("canvas", { ref: "canvas", id: "canvas", width: this.props.width || "800", height: this.props.height || "600" }));
+        return (React.createElement("canvas", { id: "canvas", width: this.props.width || "1000", height: this.props.height || "800" }));
     };
     return DecisionTree;
 }(React.Component));

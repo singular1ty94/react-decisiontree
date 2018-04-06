@@ -1,4 +1,5 @@
-// Version 1.16
+/// <reference path="./index.d.ts" />
+// Version 1.16 - Version 1.0 of Typescript Version by singular1ty94
 //
 // Interface:
 //
@@ -74,11 +75,15 @@
 //
 // eg. var MyChart = new orgChart();
 //
-const gVmlCanvasManager = null; // so non-IE won't freak out
 
-export default class OrgChart {
-  public TreeNode: (id: any, parent: any, contype: any, txt: any, bold: any, url: any,
-                    linecolor: any, fillcolor: any, textcolor: any, imgalign: any, imgvalign: any) => void;
+let G_vmlCanvasManager; // so non-IE won't freak out
+
+export class OrgChart {
+
+  public TreeNode: (id: any, parent: any, contype: any, txt: any,
+                    bold: any, url: any, linecolor: any, fillcolor: any,
+                    textcolor: any, imgalign: any, imgvalign: any,
+                    curtopradius: any, curbotradius: any, textFont: any, textSize: any, textVAlign: any) => void;
   public drawChartPriv: any;
   public drawImageNodes: any;
   public lineColor: string;
@@ -93,9 +98,7 @@ export default class OrgChart {
   public textFont: string;
   public textSize: number;
   public textVAlign: any;
-  public curshadowOffsetX: number;
-  public curshadowOffsetY: number;
-  public shadowColor: string;
+
   public curtopradius: number;
   public curbotradius: number;
   public nodes: any[];
@@ -104,45 +107,42 @@ export default class OrgChart {
   public minDistBetweenLineAndBox: number;
   public noalerts: number;
   public debug: any;
-  constructor() {
+  constructor(properties: IOrgChart = {}) {
     ///////////////////
     // Default values:
     ///////////////////
 
     this.lineColor = // Color of the connection lines (global for all lines)
-      "#3388DD";
+    properties.lineColor || "#3388DD";
 
-    this.boxWidth = 120; // Box width (global for all boxes)
+    this.boxWidth = properties.boxWidth || 160; // Box width (global for all boxes)
 
-    this.boxHeight = 30; // Box height (global for all boxes)
+    this.boxHeight = properties.boxHeight ||  80; // Box height (global for all boxes)
 
-    this.hSpace = 30; // Horizontal space in between the boxes (global for all boxes)
+    this.hSpace = properties.hSpace || 30; // Horizontal space in between the boxes (global for all boxes)
 
-    this.vSpace = 20; // Vertical space in between the boxes (global for all boxes)
+    this.vSpace = properties.vSpace || 60; // Vertical space in between the boxes (global for all boxes)
 
     this.hShift = 15; // The number of pixels vertical siblings are shifted (global for all boxes)
 
-    this.boxLineColor = // Default box line color
-      "#B5D9EA";
-
     this.boxFillColor = // Default box fill color
-      "#CFE8EF";
+    properties.boxFillColor || "#CFE8EF";
+
+    this.boxLineColor = // Default box line color
+    properties.boxLineColor || this.boxFillColor;
 
     this.textColor = // Default box text color
-      "#000000";
+    properties.textColor ||  "#000000";
 
     this.textFont = // Default font
-      "arial";
+    properties.textFont || "arial";
 
     this.textSize = 12; // Default text size (pixels, not points)
 
     this.textVAlign = 1; // Default text alignment
 
-    this.curshadowOffsetX = 3;
-    this.curshadowOffsetY = 3;
-    this.shadowColor = "#A1A1A1";
-    this.curtopradius = 5;
-    this.curbotradius = 5;
+    this.curtopradius = 0;
+    this.curbotradius = 0;
     this.nodes = [];
     let theCanvas;
 
@@ -212,7 +212,12 @@ export default class OrgChart {
       fillcolor,
       textcolor,
       imgalign,
-      imgvalign
+      imgvalign,
+      curtopradius,
+      curbotradius,
+      textFont,
+      textSize,
+      textVAlign
     ) {
       this.id = id; // User defined id
       this.parent = parent; // Parent id, user defined
@@ -224,9 +229,9 @@ export default class OrgChart {
       this.linecolor = linecolor;
       this.fillcolor = fillcolor;
       this.textcolor = textcolor;
-      this.textfont = this.textFont;
-      this.textsize = this.textSize;
-      this.valign = this.textVAlign;
+      this.textfont = textFont;
+      this.textsize = textSize;
+      this.valign = textVAlign;
       this.hpos = -1; // Horizontal starting position in pixels
       this.vpos = -1; // Vertical starting position in pixels
       this.usib = []; // 'u' siblings
@@ -236,10 +241,8 @@ export default class OrgChart {
       this.imgAlign = imgalign; // Image alignment 'l', 'c', 'r'
       this.imgVAlign = imgvalign; // Image vertical alignment 't', 'm', 'b'
       this.imgDrawn = 0;
-      this.topradius = this.curtopradius;
-      this.botradius = this.curbotradius;
-      this.shadowOffsetX = this.curshadowOffsetX;
-      this.shadowOffsetY = this.curshadowOffsetY;
+      this.topradius = curtopradius;
+      this.botradius = curbotradius;
     };
 
     //////////////////////
@@ -260,9 +263,9 @@ export default class OrgChart {
         alert(`Canvas id '${id}' not found`);
         return;
       }
-      if (gVmlCanvasManager !== undefined) {
+      if (G_vmlCanvasManager !== undefined) {
         // ie IE
-        gVmlCanvasManager.initElement(theCanvas);
+        G_vmlCanvasManager.initElement(theCanvas);
       }
 
       ctx = theCanvas.getContext("2d");
@@ -297,11 +300,11 @@ export default class OrgChart {
         leftOnCanvas();
 
         for (i = 0; i < this.nodes.length; i++) {
-          if (this.nodes[i].hpos + this.boxWidth + this.nodes[i].shadowOffsetX > maxW) {
-            maxW = this.nodes[i].hpos + this.boxWidth + this.nodes[i].shadowOffsetX;
+          if (this.nodes[i].hpos + this.boxWidth > maxW) {
+            maxW = this.nodes[i].hpos + this.boxWidth;
           }
-          if (this.nodes[i].vpos + this.boxHeight + this.nodes[i].shadowOffsetY > maxH) {
-            maxH = this.nodes[i].vpos + this.boxHeight + this.nodes[i].shadowOffsetY;
+          if (this.nodes[i].vpos + this.boxHeight > maxH) {
+            maxH = this.nodes[i].vpos + this.boxHeight;
           }
         }
 
@@ -857,8 +860,8 @@ export default class OrgChart {
       x = 0;
       for (i = 0; i < this.nodes.length; i++) {
         if (this.nodes[i].parent === "") {
-          this.nodes[i].hpos = x + this.nodes[i].shadowOffsetX;
-          this.nodes[i].vpos = 0 + this.nodes[i].shadowOffsetY;
+          this.nodes[i].hpos = x;
+          this.nodes[i].vpos = 0;
           positionTree(i, x, x);
           // hpos can be changed during positionTree:
           x = findRightMost(i) + this.boxWidth + this.hSpace; // Start for next tree
@@ -1417,7 +1420,6 @@ export default class OrgChart {
 
     drawNode = (ctx, i) => {
       let ix;
-      let gradient;
       let maxrad;
       let imgrad;
       let x = this.nodes[i].hpos;
@@ -1437,49 +1439,9 @@ export default class OrgChart {
       const imgvalign = this.nodes[i].imgVAlign;
       const toprad = this.nodes[i].topradius;
       const botrad = this.nodes[i].botradius;
-      const shadowx = this.nodes[i].shadowOffsetX;
-      const shadowy = this.nodes[i].shadowOffsetY;
-
-      // Draw shadow with gradient first:
-      if (shadowx > 0) {
-        x += shadowx;
-        y += shadowy;
-        ctx.fillStyle = this.shadowColor;
-        ctx.beginPath();
-        ctx.moveTo(x + toprad, y);
-        ctx.lineTo(x + width - toprad, y);
-        if (toprad > 0) {
-          ctx.quadraticCurveTo(x + width, y, x + width, y + toprad);
-        }
-        ctx.lineTo(x + width, y + height - botrad);
-        if (botrad > 0) {
-          ctx.quadraticCurveTo(
-            x + width,
-            y + height,
-            x + width - botrad,
-            y + height
-          );
-        }
-        ctx.lineTo(x + botrad, y + height);
-        if (botrad > 0) {
-          ctx.quadraticCurveTo(x, y + height, x, y + height - botrad);
-        }
-        ctx.lineTo(x, y + toprad);
-        if (toprad > 0) {
-          ctx.quadraticCurveTo(x, y, x + toprad, y);
-        }
-        ctx.closePath();
-        ctx.fill();
-        x -= shadowx;
-        y -= shadowy;
-      }
-
       // Draw the box:
       ctx.lineWidth = bold ? 2 : 1;
-      gradient = ctx.createLinearGradient(x, y, x, y + height);
-      gradient.addColorStop(0, "#FFFFFF");
-      gradient.addColorStop(0.7, bfcolor);
-      ctx.fillStyle = gradient;
+      ctx.fillStyle = bfcolor;
       ctx.strokeStyle = blcolor;
       ctx.beginPath();
       ctx.moveTo(x + toprad, y);
@@ -1763,10 +1725,11 @@ export default class OrgChart {
         // Top and left lines of siblings
         if (this.nodes[i].parentix >= 0) {
           if (this.nodes[i].contype === "u") {
+            // Line from top of hanging node to bridging line
             ctx.moveTo(this.nodes[i].hpos + this.boxWidth / 2, this.nodes[i].vpos);
             ctx.lineTo(
-              this.nodes[i].hpos + this.boxWidth / 2,
-              this.nodes[i].vpos - this.vSpace / 2
+              this.nodes[this.nodes[i].parentix].hpos + this.boxWidth / 2,
+              this.nodes[this.nodes[i].parentix].vpos + this.boxHeight
             );
           }
           if (this.nodes[i].contype === "l") {
@@ -1785,28 +1748,29 @@ export default class OrgChart {
           }
         }
 
-        // Downline if any siblings:
-        v = getEndOfDownline(i);
-        if (v >= 0) {
-          ctx.moveTo(this.nodes[i].hpos + this.boxWidth / 2, this.nodes[i].vpos + this.boxHeight);
-          ctx.lineTo(this.nodes[i].hpos + this.boxWidth / 2, v);
-        }
+        // // Downline if any siblings:
+        // v = getEndOfDownline(i);
+        // if (v >= 0) {
+        //   // Create the line from a parent down to the bridging line
+        //   ctx.moveTo(this.nodes[i].hpos + this.boxWidth / 2, this.nodes[i].vpos + this.boxHeight);
+        //   ctx.lineTo(this.nodes[i].hpos + this.boxWidth / 2, v);
+        // }
 
-        // Horizontal line above multiple 'u' sibs:
-        if (this.nodes[i].usib.length > 1) {
-          f = this.nodes[i].usib[0];
-          l = this.nodes[i].usib[this.nodes[i].usib.length - 1];
+        // // Horizontal line above multiple 'u' sibs (bridging line)
+        // if (this.nodes[i].usib.length > 1) {
+        //   f = this.nodes[i].usib[0];
+        //   l = this.nodes[i].usib[this.nodes[i].usib.length - 1];
 
-          ctx.moveTo(this.nodes[f].hpos + this.boxWidth / 2, this.nodes[f].vpos - this.vSpace / 2);
-          ctx.lineTo(this.nodes[l].hpos + this.boxWidth / 2, this.nodes[f].vpos - this.vSpace / 2);
-        }
-        // Horizontal line above a single 'u' sib, if not aligned:
-        if (this.nodes[i].usib.length === 1) {
-          f = this.nodes[i].usib[0];
+        //   ctx.moveTo(this.nodes[f].hpos + this.boxWidth / 2, this.nodes[f].vpos - this.vSpace / 2);
+        //   ctx.lineTo(this.nodes[l].hpos + this.boxWidth / 2, this.nodes[f].vpos - this.vSpace / 2);
+        // }
+        // // Horizontal line above a single 'u' sib, if not aligned:
+        // if (this.nodes[i].usib.length === 1) {
+        //   f = this.nodes[i].usib[0];
 
-          ctx.moveTo(this.nodes[f].hpos + this.boxWidth / 2, this.nodes[f].vpos - this.vSpace / 2);
-          ctx.lineTo(this.nodes[i].hpos + this.boxWidth / 2, this.nodes[f].vpos - this.vSpace / 2);
-        }
+        //   ctx.moveTo(this.nodes[f].hpos + this.boxWidth / 2, this.nodes[f].vpos - this.vSpace / 2);
+        //   ctx.lineTo(this.nodes[i].hpos + this.boxWidth / 2, this.nodes[f].vpos - this.vSpace / 2);
+        // }
       }
       ctx.stroke();
     };
@@ -2118,7 +2082,7 @@ export default class OrgChart {
             x = findRightMost(this.nodes[p].lsib[h], v);
             maxx = Math.max(x, maxx);
             if (maxx < 0) {
-              maxx = this.curshadowOffsetX;
+              maxx = 0;
             }
             // If the node found is the lsib itself, use this.hShift. Otherwise use hSpace/2, it looks better.
             if (x === this.nodes[this.nodes[p].lsib[h]].hpos) {
@@ -2231,16 +2195,12 @@ export default class OrgChart {
     }
   }
 
-  public setNodeStyle(toprad, botrad, shadow) {
+  public setNodeStyle(toprad, botrad) {
     if (toprad !== undefined && toprad >= 0) {
       this.curtopradius = toprad;
     }
     if (botrad !== undefined && botrad >= 0) {
       this.curbotradius = botrad;
-    }
-    if (shadow !== undefined && shadow >= 0) {
-      this.curshadowOffsetX = shadow;
-      this.curshadowOffsetY = shadow;
     }
   }
 
@@ -2380,7 +2340,12 @@ export default class OrgChart {
       fillcolor,
       textcolor,
       imgalign,
-      imgvalign
+      imgvalign,
+      this.curtopradius,
+      this.curbotradius,
+      this.textFont,
+      this.textSize,
+      this.textVAlign
     );
     if (img !== undefined) {
       n.img = new Image();

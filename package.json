@@ -1,6 +1,6 @@
 {
   "name": "react-decisiontree",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A binary decision tree chart in React.",
   "scripts": {
     "build": "tsc index.tsx index.d.ts orgchart.ts --jsx 'react' --outDir dist/"

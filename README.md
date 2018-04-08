@@ -8,7 +8,7 @@ Based on the code by https://jvloenen.home.xs4all.nl/orgchart.
 
 ```
 import * as React from 'react';
-import { DecisionTree } from 'react-decisiontree/dist';
+import DecisionTree from 'react-decisiontree/dist';
 ```
 
 The `IDecisionTree` interface is a recursive one that contains arrays with a `data` array of text
@@ -34,6 +34,9 @@ that forms the body of the decision tree.
                 subNodes: [
                     {
                         data: ["petalWidth=6.8", "entropy=0.7", "class=Iris-vertosa"],
+                    },
+                    {
+                        data: ["petalWidth=3.8", "entropy=0.4", "class=Iris-versicolor"],
                     }
                 ]
             }
@@ -41,3 +44,5 @@ that forms the body of the decision tree.
     }}
  />
 ```
+
+![react-decisiontree](https://imgur.com/w4H23R2.jpg)

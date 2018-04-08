@@ -8,7 +8,7 @@ Based on the code by https://jvloenen.home.xs4all.nl/orgchart.
 
 ```
 import * as React from 'react';
-import { DecisionTree } from 'react-decisiontree';
+import { DecisionTree } from 'react-decisiontree/dist';
 ```
 
 The `IDecisionTree` interface is a recursive one that contains arrays with a `data` array of text
